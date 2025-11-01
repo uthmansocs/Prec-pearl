@@ -2,19 +2,110 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fibre-net-watch</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <!-- Mobile viewport and iOS edge-to-edge support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f172a" />
 
-    <meta property="og:title" content="fibre-net-watch" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <title>Fibre Report Hub</title>
+    <meta name="description" content="Fibre Report Hub - fibre downtime & escalation tracking" />
+    <meta name="author" content="Fibre Report Hub" />
+
+    <meta property="og:title" content="Fibre Report Hub" />
+    <meta property="og:description" content="Fibre Report Hub - fibre downtime & escalation tracking" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <!-- Mobile fixes: hide likely sidebars on small screens, prevent horizontal overflow,
+         and make wide tables scrollable. Limited to <= 768px and conservative selectors. -->
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      @media (max-width: 768px) {
+        html, body {
+          overflow-x: hidden !important;
+        }
+
+        /* Hide common sidebar selectors on mobile */
+        aside,
+        .sidebar,
+        .left-rail,
+        .sidenav,
+        nav[aria-label="Sidebar"],
+        [data-sidebar] {
+          display: none !important;
+          visibility: hidden !important;
+          width: 0 !important;
+          min-width: 0 !important;
+          max-width: 0 !important;
+        }
+
+        /* Ensure app root and main content use full width on mobile */
+        #root,
+        #app,
+        main,
+        .main-content {
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        /* Remove left padding/margins used for desktop sidebar */
+        [class*="pl-"], [class*="ml-"], [style*="padding-left"], [style*="margin-left"] {
+          padding-left: 0 !important;
+          margin-left: 0 !important;
+        }
+
+        /* Make wide tables scrollable */
+        .table-wrapper, .overflow-fix, .table-container {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+          max-width: 100%;
+          width: 100%;
+          table-layout: auto;
+        }
+
+        /* Slightly larger touch targets */
+        button, a, input, select, textarea {
+          min-height: 40px;
+          min-width: 40px;
+        }
+      }
+
+      /* Helper hook for mobile-specific CSS */
+      html.is-mobile { }
+    </style>
+
+    <!-- Small script to toggle .is-mobile class on <html> -->
+    <script>
+      (function () {
+        function updateMobileClass() {
+          if (window.innerWidth <= 768) {
+            document.documentElement.classList.add('is-mobile');
+          } else {
+            document.documentElement.classList.remove('is-mobile');
+          }
+        }
+        updateMobileClass();
+        window.addEventListener('resize', function () {
+          clearTimeout(window.__mobileDebounce);
+          window.__mobileDebounce = setTimeout(updateMobileClass, 120);
+        });
+      })();
+    </script>
   </head>
 
   <body>
