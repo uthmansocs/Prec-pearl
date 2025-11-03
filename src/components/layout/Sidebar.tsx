@@ -1,10 +1,9 @@
-// src/components/Sidebar.tsx
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Building2,
   FileText,
@@ -17,83 +16,132 @@ import {
   AlertTriangle,
   BarChart3,
   Plus,
-  XCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  XCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
-  // mobile open state controlled by parent (AppLayout)
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMobile }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  mobileOpen = false,
+  onCloseMobile,
+}) => {
   const { profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/auth');
+    navigate("/auth");
   };
 
   const navigation = [
-    { name: 'Admin Dashboard', icon: TrendingUp, href: '/admin', roles: ['admin'] },
+    { name: "Admin Dashboard", icon: TrendingUp, href: "/admin", roles: ["admin"] },
     {
-      name: 'Site Data',
+      name: "Site Data",
       icon: Building2,
       items: [
-        { name: 'MTN', href: '/sites/mtn', roles: ['admin', 'fibre_network'] },
-        { name: 'Airtel', href: '/sites/airtel', roles: ['admin', 'fibre_network'] },
-        { name: 'Glo', href: '/sites/glo', roles: ['admin', 'fibre_network'] }
-      ]
+        { name: "MTN", href: "/sites/mtn", roles: ["admin", "fibre_network"] },
+        { name: "Airtel", href: "/sites/airtel", roles: ["admin", "fibre_network"] },
+        { name: "Glo", href: "/sites/glo", roles: ["admin", "fibre_network"] },
+      ],
     },
     {
-      name: 'Staff Workflow',
+      name: "Staff Workflow",
       icon: FileText,
       items: [
-        { name: 'Create Report', href: '/staff/create-report', roles: ['staff'] },
-        { name: 'In Progress', href: '/staff/in-progress', roles: ['staff'] },
-        { name: 'Ready to Resolve', href: '/staff/resolved', roles: ['staff'] }
-      ]
+        { name: "Create Report", href: "/staff/create-report", roles: ["staff"] },
+        { name: "In Progress", href: "/staff/in-progress", roles: ["staff"] },
+        { name: "Ready to Resolve", href: "/staff/resolved", roles: ["staff"] },
+      ],
     },
     {
-      name: 'Reports',
+      name: "Reports",
       icon: FileText,
       items: [
-        { name: 'All Reports', href: '/reports', roles: ['admin', 'staff'] },
-        { name: 'In Progress', href: '/reports/in-progress', roles: ['admin', 'staff'] },
-        { name: 'Resolved', href: '/reports/resolved', roles: ['admin', 'staff'] },
-        { name: 'Drafts', href: '/reports/drafts', roles: ['staff'] },
-        { name: 'MTN Reports', href: '/reports/mtn', roles: ['admin', 'staff', 'fibre_network'] },
-        { name: 'Airtel Reports', href: '/reports/airtel', roles: ['admin', 'staff', 'fibre_network'] },
-        { name: 'Glo Reports', href: '/reports/glo', roles: ['admin', 'staff', 'fibre_network'] }
-      ]
+        { name: "All Reports", href: "/reports", roles: ["admin", "staff"] },
+        { name: "In Progress", href: "/reports/in-progress", roles: ["admin", "staff"] },
+        { name: "Resolved", href: "/reports/resolved", roles: ["admin", "staff"] },
+        { name: "Drafts", href: "/reports/drafts", roles: ["staff"] },
+        { name: "MTN Reports", href: "/reports/mtn", roles: ["admin", "staff", "fibre_network"] },
+        { name: "Airtel Reports", href: "/reports/airtel", roles: ["admin", "staff", "fibre_network"] },
+        { name: "Glo Reports", href: "/reports/glo", roles: ["admin", "staff", "fibre_network"] },
+      ],
     },
-    { name: 'Analytics', icon: BarChart3, href: '/analytics', roles: ['admin', 'staff','fibre_network' ] },
-    { name: 'Down Links', icon: AlertTriangle, href: '/down-links', roles: ['admin', 'fibre_network'] },
-    { name: 'Close Link', icon: XCircle, href: '/close-link', roles: ['fibre_network'] },
-    { name: 'Technician Map', icon: MapPin, href: '/technician-map', roles: ['admin', 'fibre_network'] },
-    { name: 'Settings', icon: Settings, href: '/settings', roles: ['staff'] }
+    { name: "Analytics", icon: BarChart3, href: "/analytics", roles: ["admin", "staff", "fibre_network"] },
+    { name: "Down Links", icon: AlertTriangle, href: "/down-links", roles: ["admin", "fibre_network"] },
+    { name: "Close Link", icon: XCircle, href: "/close-link", roles: ["fibre_network"] },
+    { name: "Technician Map", icon: MapPin, href: "/technician-map", roles: ["admin", "fibre_network"] },
+    { name: "Settings", icon: Settings, href: "/settings", roles: ["staff"] },
   ];
 
-  const hasAccess = (roles: string[]) => {
-    return profile && roles.includes(profile.role);
-  };
+  const hasAccess = (roles: string[]) => profile && roles.includes(profile.role);
+  const isActive = (href: string) =>
+    location.pathname === href || location.pathname.startsWith(href + "/");
 
-  const isActive = (href: string) => {
-    return location.pathname === href || location.pathname.startsWith(href + '/');
-  };
+  /** 🧠 Scroll Lock */
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
-  /**
-   * Desktop sidebar (hidden on small screens)
-   * Mobile drawer (hidden on lg+).
-   */
+  /** 🧠 Swipe to close */
+  useEffect(() => {
+    const drawer = drawerRef.current;
+    if (!drawer) return;
+    let startX = 0;
+    let currentX = 0;
+    let touching = false;
 
-  // Desktop sidebar classes use isCollapsed to shrink to icons only.
+    const onTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      touching = true;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!touching) return;
+      currentX = e.touches[0].clientX;
+      const deltaX = currentX - startX;
+      if (deltaX < 0) {
+        drawer.style.transform = `translateX(${Math.max(deltaX, -300)}px)`;
+      }
+    };
+
+    const onTouchEnd = () => {
+      touching = false;
+      const deltaX = currentX - startX;
+      if (deltaX < -100) {
+        onCloseMobile?.();
+      } else {
+        drawer.style.transform = "";
+      }
+    };
+
+    drawer.addEventListener("touchstart", onTouchStart);
+    drawer.addEventListener("touchmove", onTouchMove);
+    drawer.addEventListener("touchend", onTouchEnd);
+
+    return () => {
+      drawer.removeEventListener("touchstart", onTouchStart);
+      drawer.removeEventListener("touchmove", onTouchMove);
+      drawer.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [onCloseMobile]);
+
+  /** --- Desktop --- */
   const desktopClass = cn(
-    "hidden sm:flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
+    "hidden sm:flex flex-col h-screen bg-card border-r border-border transition-all duration-300 ease-in-out",
     isCollapsed ? "w-16" : "w-64"
   );
 
@@ -102,29 +150,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
       {/* --- MOBILE DRAWER --- */}
       <div
         className={cn(
-          "sm:hidden fixed inset-0 z-50 transition-opacity",
+          "sm:hidden fixed inset-0 z-50 transition-opacity ease-in-out duration-300 overscroll-contain",
           mobileOpen ? "pointer-events-auto" : "pointer-events-none"
         )}
-        aria-hidden={!mobileOpen}
       >
         {/* overlay */}
         <div
           className={cn(
-            "absolute inset-0 bg-black/40",
-            mobileOpen ? "opacity-100" : "opacity-0",
-            "transition-opacity"
+            "absolute inset-0 bg-black/40 transition-opacity duration-300",
+            mobileOpen ? "opacity-100" : "opacity-0"
           )}
           onClick={onCloseMobile}
         />
 
         {/* drawer panel */}
         <nav
+          ref={drawerRef}
           className={cn(
-            "absolute top-0 left-0 h-full bg-card w-72 p-4 border-r border-border transform transition-transform",
+            "absolute top-0 left-0 h-full w-72 bg-card p-4 border-r border-border shadow-xl transform transition-transform duration-300 ease-in-out pt-safe-top pb-safe-bottom",
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
-          <div className="flex items-center justify-between mb-3">
+          {/* header */}
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-primary-foreground" />
@@ -139,7 +187,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
             </Button>
           </div>
 
-          {/* user */}
+          {/* user info */}
           <div className="p-2 mb-3 border-b border-border">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -150,15 +198,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{profile?.full_name}</p>
                 <Badge variant="secondary" className="text-xs mt-1">
-                  {profile?.role?.replace('_', ' ').toUpperCase()}
+                  {profile?.role?.replace("_", " ").toUpperCase()}
                 </Badge>
               </div>
             </div>
           </div>
 
-          {/* nav items */}
+          {/* nav */}
           <div className="flex-1 overflow-y-auto space-y-2">
-            {profile?.role === 'staff' && (
+            {profile?.role === "staff" && (
               <Button asChild className="w-full justify-start mb-2">
                 <Link to="/staff/create-report" onClick={onCloseMobile}>
                   <Plus className="h-4 w-4" />
@@ -186,8 +234,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
                 );
               }
 
-              const accessibleItems = section.items?.filter(item => hasAccess(item.roles)) || [];
-              if (accessibleItems.length === 0) return null;
+              const accessibleItems = section.items?.filter((i) => hasAccess(i.roles)) || [];
+              if (!accessibleItems.length) return null;
               const SectionIcon = section.icon as any;
 
               return (
@@ -195,7 +243,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
                   <h3 className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {section.name}
                   </h3>
-                  {accessibleItems.map(item => (
+                  {accessibleItems.map((item) => (
                     <Button
                       key={item.href}
                       asChild
@@ -214,7 +262,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
           </div>
 
           {/* footer */}
-          <div className="mt-3 space-y-2 border-t border-border pt-3">
+          <div className="mt-4 space-y-2 border-t border-border pt-3 pb-safe-bottom">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Theme</span>
               <ThemeToggle />
@@ -228,8 +276,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
       </div>
 
       {/* --- DESKTOP SIDEBAR --- */}
-      <aside className={desktopClass} aria-hidden={false}>
-        {/* Header */}
+      <aside className={desktopClass}>
+        {/* header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
@@ -242,13 +290,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               </div>
             </div>
           )}
-
-          <Button variant="ghost" size="sm" onClick={() => setIsCollapsed(!isCollapsed)} className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="h-8 w-8 p-0"
+          >
             {isCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
           </Button>
         </div>
 
-        {/* User Info */}
+        {/* user */}
         {!isCollapsed && (
           <div className="p-4 border-b border-border">
             <div className="flex items-center space-x-3">
@@ -259,19 +311,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{profile?.full_name}</p>
-                <div className="flex items-center space-x-1">
-                  <Badge variant="secondary" className="text-xs">
-                    {profile?.role?.replace('_', ' ').toUpperCase()}
-                  </Badge>
-                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {profile?.role?.replace("_", " ").toUpperCase()}
+                </Badge>
               </div>
             </div>
           </div>
         )}
 
-        {/* Navigation */}
+        {/* nav */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {profile?.role === 'staff' && (
+          {profile?.role === "staff" && (
             <Button asChild className="w-full justify-start mb-4" size={isCollapsed ? "sm" : "default"}>
               <Link to="/staff/create-report">
                 <Plus className="h-4 w-4" />
@@ -279,7 +329,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               </Link>
             </Button>
           )}
-
           {navigation.map((section) => {
             if (section.href) {
               if (!hasAccess(section.roles || [])) return null;
@@ -300,10 +349,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               );
             }
 
-            const accessibleItems = section.items?.filter(item => hasAccess(item.roles)) || [];
-            if (accessibleItems.length === 0) return null;
+            const accessibleItems = section.items?.filter((i) => hasAccess(i.roles)) || [];
+            if (!accessibleItems.length) return null;
             const SectionIcon = section.icon as any;
-
             return (
               <div key={section.name} className="space-y-1">
                 {!isCollapsed && (
@@ -330,7 +378,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
           })}
         </nav>
 
-        {/* Footer */}
+        {/* footer */}
         <div className="p-4 border-t border-border space-y-2">
           {!isCollapsed && (
             <div className="flex items-center justify-between mb-2">
@@ -338,7 +386,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               <ThemeToggle />
             </div>
           )}
-          <Button variant="ghost" className="w-full justify-start" onClick={handleSignOut} size={isCollapsed ? "sm" : "default"}>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={handleSignOut}
+            size={isCollapsed ? "sm" : "default"}
+          >
             <LogOut className="h-4 w-4" />
             {!isCollapsed && <span className="ml-2">Sign Out</span>}
           </Button>
