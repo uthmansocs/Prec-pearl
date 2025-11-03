@@ -1,8 +1,8 @@
 // src/layouts/AppLayout.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from './Sidebar';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AppLayoutProps {
@@ -12,6 +12,35 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Client-side enhancement: copy table headers into td[data-label]
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const enhanceTables = () => {
+      const wrappers = Array.from(document.querySelectorAll<HTMLElement>('.table-responsive'));
+      wrappers.forEach((wrapper) => {
+        const table = wrapper.querySelector('table');
+        if (!table) return;
+
+        const ths = Array.from(table.querySelectorAll('thead th')).map(h => h.textContent?.trim() || '');
+        table.querySelectorAll('tbody tr').forEach((tr) => {
+          Array.from(tr.children).forEach((cell, idx) => {
+            const el = cell as HTMLElement;
+            // guard in case header count differs from cells
+            const label = ths[idx] || '';
+            if (!el.hasAttribute('data-label') && label) {
+              el.setAttribute('data-label', label);
+            }
+          });
+        });
+      });
+    };
+
+    // Run once after mount, and also when window resizes (covers late-rendered tables)
+    enhanceTables();
+    window.addEventListener('resize', enhanceTables);
+    return () => window.removeEventListener('resize', enhanceTables);
+  }, []);
 
   if (loading) {
     return (
