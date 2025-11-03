@@ -1,42 +1,45 @@
+/* Cleaned Fibre Report Hub App Styles
+   Removed Vite defaults that break responsive layouts */
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent sideways scroll */
+  text-align: left; /* Remove center lock */
+}
+
+/* Ensure layout uses full width */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
+/* Global card and section tweaks */
 .card {
-  padding: 2em;
+  padding: 1rem;
+  border-radius: 0.75rem;
 }
 
-.read-the-docs {
-  color: #888;
+/* Smooth transitions */
+* {
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Responsive: make sure small devices can scroll naturally */
+@media (max-width: 640px) {
+  html, body {
+    overflow-x: auto;
+  }
+
+  .card {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  main {
+    padding: 0.75rem;
+  }
 }

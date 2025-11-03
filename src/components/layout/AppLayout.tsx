@@ -13,7 +13,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Client-side enhancement: copy table headers into td[data-label]
+  // Responsive enhancement: copy table headers into td[data-label]
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
@@ -27,7 +27,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         table.querySelectorAll('tbody tr').forEach((tr) => {
           Array.from(tr.children).forEach((cell, idx) => {
             const el = cell as HTMLElement;
-            // guard in case header count differs from cells
             const label = ths[idx] || '';
             if (!el.hasAttribute('data-label') && label) {
               el.setAttribute('data-label', label);
@@ -37,7 +36,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       });
     };
 
-    // Run once after mount, and also when window resizes (covers late-rendered tables)
     enhanceTables();
     window.addEventListener('resize', enhanceTables);
     return () => window.removeEventListener('resize', enhanceTables);
@@ -55,13 +53,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
       {/* Sidebar: desktop + mobile drawer */}
       <Sidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
 
-      {/* Main area */}
-      <div className="flex-1 flex flex-col">
-        {/* Topbar for mobile (only visible on small screens) */}
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col w-full">
+        {/* Mobile header */}
         <header className="sm:hidden z-20 bg-background/80 backdrop-blur-sm border-b border-border">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
@@ -70,17 +68,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </Button>
               <div className="text-lg font-semibold">Fibre Report Hub</div>
             </div>
-
-            <div className="flex items-center gap-2">
-              {/* space for small actions or notifications */}
-              <div className="text-sm text-muted-foreground">v1.0</div>
-            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">v1.0</div>
           </div>
         </header>
 
-        {/* Content */}
-        <main className="flex-1 overflow-auto">
-          <div className="max-w-screen-xl mx-auto p-4 sm:p-6">
+        {/* Content section */}
+        <main className="flex-1 overflow-y-auto w-full">
+          <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 py-4">
             {children}
           </div>
         </main>
