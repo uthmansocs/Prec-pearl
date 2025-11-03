@@ -23,7 +23,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         const table = wrapper.querySelector('table');
         if (!table) return;
 
-        const ths = Array.from(table.querySelectorAll('thead th')).map(h => h.textContent?.trim() || '');
+        const ths = Array.from(table.querySelectorAll('thead th')).map(
+          (h) => h.textContent?.trim() || ''
+        );
         table.querySelectorAll('tbody tr').forEach((tr) => {
           Array.from(tr.children).forEach((cell, idx) => {
             const el = cell as HTMLElement;
@@ -41,6 +43,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     return () => window.removeEventListener('resize', enhanceTables);
   }, []);
 
+  // Prevent background scroll when sidebar is open on mobile
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : 'auto';
+  }, [mobileOpen]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -53,17 +60,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
+    <div className="flex min-h-screen w-full bg-background overflow-x-auto sm:overflow-x-hidden">
       {/* Sidebar: desktop + mobile drawer */}
       <Sidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col w-full">
         {/* Mobile header */}
-        <header className="sm:hidden z-20 bg-background/80 backdrop-blur-sm border-b border-border">
+        <header className="sm:hidden z-20 bg-background/80 backdrop-blur-sm border-b border-border sticky top-0">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" className="p-2" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2"
+                onClick={() => setMobileOpen(true)}
+                aria-label="Open menu"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
               <div className="text-lg font-semibold">Fibre Report Hub</div>
@@ -73,7 +86,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
 
         {/* Content section */}
-        <main className="flex-1 overflow-y-auto w-full">
+        <main className="flex-1 overflow-y-auto w-full touch-pan-y">
           <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 py-4">
             {children}
           </div>

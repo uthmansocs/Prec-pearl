@@ -215,3 +215,14 @@ main, .main-content, .page-wrapper {
   .filters-group { display: none !important; }
   .filters-compact { display: block !important; }
 }
+
+html, body {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.sidebar {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
