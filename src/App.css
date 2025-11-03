@@ -5,6 +5,13 @@
   text-align: center;
 }
 
+/* Reduce root padding slightly on small screens so content uses more vertical space */
+@media (max-width: 1024px) {
+  #root {
+    padding: 1rem;
+  }
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

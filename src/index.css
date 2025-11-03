@@ -153,40 +153,62 @@
     animation: pulse-urgent 2s infinite;
   }
 }
-/* ------------------ Mobile layout & responsive table -> card fixes ------------------ */
+
+/* ------------------ Mobile fixes: hide desktop sidebar + responsive table -> card ------------------ */
 
 /* Prevent horizontal scroll from rogue elements */
 html, body {
   overflow-x: hidden;
 }
 
-/* Make main container full width on small screens (overrides max-w-* utilities) */
-@media (max-width: 640px) {
-  .max-w-screen-xl, .container, .mx-auto {
+/* Hide the desktop sidebar (target both a specific class and general aside as fallback) */
+@media (max-width: 1024px) {
+  /* if you added .app-sidebar to <aside>, this will target it */
+  .app-sidebar {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* fallback: target the generic aside element if .app-sidebar is not present */
+  aside {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Ensure mobile topbar/hamburger remains visible */
+  header[class*="sm:hidden"], .sm\:hidden {
+    display: flex !important;
+  }
+
+  /* Make main container use full device width */
+  #root,
+  .max-w-screen-xl,
+  .container,
+  .mx-auto {
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    padding-left: 0.75rem !important;  /* 12px */
-    padding-right: 0.75rem !important; /* 12px */
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
 
-  /* Reduce card padding and radius on small screens */
-  .card, .bg-card {
-    border-radius: 0.5rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+  /* Avoid horizontal overflow from main wrapper */
+  main, .main-content, .page-wrapper {
+    overflow-x: hidden !important;
   }
 
-  /* Compact top heading spacing so header doesn't take too much vertical space */
-  h1, .page-title {
-    font-size: 1.125rem;
-    margin-bottom: 0.5rem;
+  /* Slightly reduce #root padding on small screens */
+  #root {
+    padding: 0.75rem !important;
   }
 }
 
 /* --------- Convert table rows to stacked cards for <= 1024px (tablet + mobile) --------- */
 @media (max-width: 1024px) {
-  /* Target the ResponsiveTable wrapper class used in your layout */
   .table-responsive table,
   .table-responsive thead,
   .table-responsive tbody,
@@ -196,7 +218,7 @@ html, body {
     display: block;
   }
 
-  /* Hide original header row (we'll show labels inside each cell) */
+  /* Hide original header row (labels will show inside cells) */
   .table-responsive thead tr {
     position: absolute;
     top: -9999px;
@@ -206,17 +228,18 @@ html, body {
     visibility: hidden;
   }
 
-  /* Make each table row a card */
+  .table-responsive thead { display: none; }
+
+  /* Make each table row appear as a card */
   .table-responsive tr {
     margin: 0 0 0.875rem 0; /* gap between cards */
-    border: 1px solid rgba(255,255,255,0.04); /* subtle border that works in dark mode */
+    border: 1px solid rgba(255,255,255,0.04);
     padding: 0.75rem;
     border-radius: 0.625rem;
-    background-color: hsl(var(--card)); /* respects your theme tokens */
-    box-shadow: 0 1px 0 rgba(2,6,23,0.25);
+    background-color: hsl(var(--card));
   }
 
-  /* Make cells block-level and show label via data-label (inserted by JS) */
+  /* Cells become block-level; labels rendered from data-label */
   .table-responsive td {
     display: block;
     padding: 0.4rem 0.75rem 0.4rem 42%;
@@ -226,7 +249,8 @@ html, body {
     color: hsl(var(--card-foreground));
   }
 
-  .table-responsive td:before {
+  .table-responsive td:before,
+  .table-responsive td[data-label]::before {
     content: attr(data-label);
     position: absolute;
     left: 0.75rem;
@@ -240,7 +264,7 @@ html, body {
     white-space: nowrap;
   }
 
-  /* Adjust specific elements inside cells (badges, small meta lines) */
+  /* Adjust elements inside cells */
   .table-responsive td .badge,
   .table-responsive td .actions,
   .table-responsive td .meta {
@@ -248,12 +272,10 @@ html, body {
     display: inline-block;
   }
 
-  /* Keep provider badge aligned right in desktop-like rows when needed */
   .table-responsive td.provider {
-    padding-left: 0.75rem; /* label handled, position content normally */
+    padding-left: 0.75rem;
   }
 
-  /* Make buttons full-width inside list items */
   .table-responsive td .btn, .table-responsive td button {
     width: 100%;
     margin-top: 0.5rem;

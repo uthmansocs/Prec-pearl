@@ -22,7 +22,6 @@ import {
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
-  // mobile open state controlled by parent (AppLayout)
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
 }
@@ -71,29 +70,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
         { name: 'Glo Reports', href: '/reports/glo', roles: ['admin', 'staff', 'fibre_network'] }
       ]
     },
-    { name: 'Analytics', icon: BarChart3, href: '/analytics', roles: ['admin', 'staff','fibre_network' ] },
+    { name: 'Analytics', icon: BarChart3, href: '/analytics', roles: ['admin', 'staff', 'fibre_network'] },
     { name: 'Down Links', icon: AlertTriangle, href: '/down-links', roles: ['admin', 'fibre_network'] },
     { name: 'Close Link', icon: XCircle, href: '/close-link', roles: ['fibre_network'] },
     { name: 'Technician Map', icon: MapPin, href: '/technician-map', roles: ['admin', 'fibre_network'] },
     { name: 'Settings', icon: Settings, href: '/settings', roles: ['staff'] }
   ];
 
-  const hasAccess = (roles: string[]) => {
-    return profile && roles.includes(profile.role);
-  };
+  const hasAccess = (roles: string[]) => profile && roles.includes(profile.role);
+  const isActive = (href: string) => location.pathname === href || location.pathname.startsWith(href + '/');
 
-  const isActive = (href: string) => {
-    return location.pathname === href || location.pathname.startsWith(href + '/');
-  };
-
-  /**
-   * Desktop sidebar (hidden on small screens)
-   * Mobile drawer (hidden on lg+).
-   */
-
-  // Desktop sidebar classes use isCollapsed to shrink to icons only.
   const desktopClass = cn(
-    "hidden sm:flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
+    "app-sidebar hidden sm:flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
     isCollapsed ? "w-16" : "w-64"
   );
 
@@ -242,7 +230,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onCloseMob
               </div>
             </div>
           )}
-
           <Button variant="ghost" size="sm" onClick={() => setIsCollapsed(!isCollapsed)} className="h-8 w-8 p-0">
             {isCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
           </Button>
