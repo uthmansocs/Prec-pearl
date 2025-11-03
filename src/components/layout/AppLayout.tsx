@@ -12,6 +12,7 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
   // Client-side enhancement: copy table headers into td[data-label]
   useEffect(() => {
     if (typeof document === 'undefined') return;
