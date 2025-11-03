@@ -12,12 +12,14 @@ export function ResponsiveLayout({ children, className }: ResponsiveLayoutProps)
       "w-full min-h-screen",
       "px-4 py-6 sm:px-6 lg:px-8",
       "space-y-4 sm:space-y-6",
+      "max-w-screen-xl mx-auto",
       className
     )}>
       {children}
     </div>
   );
 }
+
 
 export function ResponsiveGrid({ children, className }: ResponsiveLayoutProps) {
   return (
